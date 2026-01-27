@@ -25,14 +25,32 @@ const rows = Math.floor(board.clientHeight / blockHeight);
 
 let intervalId = null
 let timeIntervalId = null
-let food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)}
+// let food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)}
 
-const blocks = []
 let snake = [ {
     x: 1, y: 3
 }, ]
 
+function generateFood() {
+    let newFood;
+    do {
+        newFood = { 
+            x: Math.floor(Math.random() * rows),
+            y: Math.floor(Math.random() * cols)
+        }
+    } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y))
+    return newFood;
+}
+
+
+
+let food = generateFood()
+
+const blocks = []
+
+
 let direction = "down"
+let lastDirection = "down"
 
 for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++ ) {
@@ -41,7 +59,6 @@ for (let row = 0; row < rows; row++) {
         board.appendChild(block);
         // block.innerText = `${row} - ${col}`
         blocks[`${row}-${col}` ] = block
-
     }
 }
 
@@ -59,9 +76,12 @@ function render() {
         head = {x: snake[0].x - 1, y: snake[0].y }  
     } 
 
-    // food 
+    lastDirection = direction
+
+    // Wall Collision Code
     if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
         clearInterval(intervalId)
+        clearInterval(timeIntervalId)
 
         modal.style.display = "flex";
         startGameModal.style.display = "none";
@@ -69,12 +89,26 @@ function render() {
         return
     }
 
+    // Check self collision
+    for (let i = 0; i < snake.length; i++) {
+        if (head.x === snake[i].x && head.y === snake[i].y) {
+            clearInterval(intervalId)
+            clearInterval(timeIntervalId)
+
+            modal.style.display = "flex";
+            startGameModal.style.display = "none";
+            gameOverModal.style.display = "flex"
+            return
+        }
+    }
+
     // food consume logic
     if (head.x == food.x && head.y == food.y) {
         blocks[`${food.x}-${food.y}` ].classList.remove("food")
-        food = { 
-            x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)
-        }
+        // food = { 
+        //     x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)
+        // }
+        food = generateFood()
         blocks[`${food.x}-${food.y}` ].classList.add("food")
 
         snake.unshift(head)
@@ -85,22 +119,34 @@ function render() {
         if( score > highScore) {
             highScore = score
             localStorage.setItem("highscore", highScore.toString())
+            highScoreElement.innerHTML = highScore
         }
-    }
-
-
-    snake.forEach(segment => { 
+    } else {snake.forEach(segment => { 
         blocks[ `${segment.x}-${segment.y}`].classList.remove("fill")
     });
 
     snake.unshift(head)
     snake.pop()
-    snake.forEach(segment => { 
+}
+snake.forEach(segment => { 
         blocks[ `${segment.x}-${segment.y}`].classList.add("fill")
 
-        
     });
 }
+
+//     for (let segment of snake) {
+//     if (segment.x === head.x && segment.y === head.y) {
+//         clearInterval(intervalId)
+
+//         modal.style.display = "flex";
+//         startGameModal.style.display = "none";
+//         gameOverModal.style.display = "flex"
+//         return
+//     }
+// }
+
+
+    
 
 startButton.addEventListener("click", function() {
     modal.style.display = "none"
@@ -117,7 +163,8 @@ startButton.addEventListener("click", function() {
             sec += 1
         }
         
-        time = `${min}:${sec}`
+        time = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+        // time = `${min}:${sec}`
         timeElement.innerText = time
     },1000)
 })
@@ -125,6 +172,9 @@ startButton.addEventListener("click", function() {
 restartButton.addEventListener("click", restartGame);
 
 function restartGame() {
+    clearInterval(intervalId);
+    clearInterval(timeIntervalId);
+   
     blocks[`${food.x}-${food.y}` ].classList.remove("food")
     snake.forEach(segment => { 
         blocks[ `${segment.x}-${segment.y}`].classList.remove("fill")
@@ -139,89 +189,39 @@ function restartGame() {
 
     modal.style.display = "none"
     direction = "down"
+    lastDirection = "down" 
+
     snake = [ { x: 1, y: 3} ]
-    food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)}
+    // food = { x: Math.floor(Math.random() * rows), y: Math.floor(Math.random() * cols)}
+    food = generateFood()
     intervalId = setInterval(() => {
         render()
     }, 250); 
-    
+
+     timeIntervalId = setInterval(()=> {
+        let [min,sec] = time.split(":").map(Number)
+
+        if( sec == 59) {
+            min += 1
+            sec = 0 
+        } else {
+            sec += 1
+        }
+        
+        time = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+        timeElement.innerText = time
+    },1000)
+
 }
 
 addEventListener("keydown", (event)=> {
-    // console.log(event.key)
-    if (event.key === "ArrowUp") {
+    if (event.key === "ArrowUp" && lastDirection !== "down") {
         direction = "up"
-    } else if (event.key === "ArrowDown") {
-        direction = "down"
-    } else if (event.key === "ArrowLeft") {
-        direction = "left"
-    } else if (event.key === "ArrowRight") {
+    } else if (event.key === "ArrowRight" && lastDirection !== "left") {
         direction = "right"
-    }
+    } else if (event.key === "ArrowDown" && lastDirection !== "up") {
+        direction = "down"
+    } else if (event.key === "ArrowLeft" && lastDirection !== "right") {
+        direction = "left"
+    } 
 });
-
-// intervalId = setInterval(() => {
-//     let head = null
-//     if(direction === "left") {
-//         head = {x: snake[0].x, y: snake[0].y - 1  }
-//     } else if(direction === "right") {
-//         head = {x: snake[0].x, y: snake[0].y + 1  }  
-//     } else if(direction === "down") {
-//         head = {x: snake[0].x + 1, y: snake[0].y }  
-//     } else if(direction === "up") {
-//         head = {x: snake[0].x - 1, y: snake[0].y }  
-//     } 
-
-//     if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
-//         alert("Game Over");
-//         clearInterval(intervalId)
-
-//     }
-
-//     snake.forEach(segment => { 
-//         blocks[ `${segment.x}-${segment.y}`].classList.remove("fill")
-//     });
-
-//     snake.unshift(head)
-//     snake.pop()
-    
-//     render()
-// }, 250);
-
-
-// const startGame = () => {
-//     setInterval(() => {
-//     let head = null
-//     if(direction === "left") {
-//         head = {x: snake[0].x, y: snake[0].y - 1  }
-//     } else if(direction === "right") {
-//         head = {x: snake[0].x, y: snake[0].y + 1  }
-        
-//     }
-
-//     snake.forEach(segment => { 
-//         blocks[ `${segment.x}-${segment.y}`].classList.remove("fill")
-
-        
-//     });
-
-//     snake.unshift(head)
-//     snake.pop()
-    
-//     render()
-// }, 400);
-// }
-
-
-//------------------------
-
-
-
-//------------------------
-
-
- 
-
-// intervalId = setInterval(() => {
-//     render()
-// }, 250);

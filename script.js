@@ -226,6 +226,320 @@
 //     } 
 // });
 
+// const board = document.querySelector('.board');
+// const startButton = document.querySelector('.btn-start');
+// const modal = document.querySelector(".modal");
+
+// const startGameModal = document.querySelector(".start-game");
+// const gameOverModal = document.querySelector(".game-over");
+// const restartButton = document.querySelector(".btn-restart");
+
+// const highScoreElement = document.querySelector("#high-score");
+// const scoreElement = document.querySelector("#score");
+// const timeElement = document.querySelector("#time")
+
+
+// const blockHeight = 50;
+// const blockWidth = 50;
+
+// let highScore = localStorage.getItem("highscore") || 0
+// let score = 0 
+// let time = `00:00`
+
+// highScoreElement.innerText = highScore
+
+// const cols = Math.floor(board.clientWidth / blockWidth);
+// const rows = Math.floor(board.clientHeight / blockHeight);
+
+// let intervalId = null
+// let timeIntervalId = null
+
+// let snake = [ {
+//     x: 1, y: 3
+// }, ]
+
+// function generateFood() {
+//     let newFood;
+//     do {
+//         newFood = { 
+//             x: Math.floor(Math.random() * rows),
+//             y: Math.floor(Math.random() * cols)
+//         }
+//     } while (snake.some(segment => segment.x === newFood.x && segment.y === newFood.y))
+//     return newFood;
+// }
+
+// let food = generateFood()
+
+// const blocks = []
+
+// let direction = "down"
+// let lastDirection = "down"
+
+// for (let row = 0; row < rows; row++) {
+//     for (let col = 0; col < cols; col++ ) {
+//         const block = document.createElement('div');
+//         block.classList.add('block')
+//         board.appendChild(block);
+//         blocks[`${row}-${col}` ] = block
+//     }
+// }
+
+// // function showGameOver(isWin = false) {
+// //     clearInterval(intervalId)
+// //     clearInterval(timeIntervalId)
+    
+// //     // Remove food class to prevent red color remaining
+// //     blocks[`${food.x}-${food.y}`].classList.remove("food")
+    
+// //     modal.style.display = "flex";
+// //     startGameModal.style.display = "none";
+// //     gameOverModal.style.display = "flex"
+    
+// //     // Update game over text based on win/loss
+// //     const gameOverTitle = gameOverModal.querySelector("h2");
+// //     if (isWin) {
+// //         gameOverTitle.textContent = "You Won! 🎉";
+// //         gameOverTitle.style.color = "#4CAF50"; // Green color for win
+// //     } else {
+// //         gameOverTitle.textContent = "You Won! 🎉, Game has been finished";
+// //         gameOverTitle.style.color = "#4CAF50"; // Green color for win
+// //         // gameOverTitle.textContent = "Game Over";
+// //         // gameOverTitle.style.color = "#fff"; // Default color for loss
+// //     }
+    
+// //     // Highlight score and time
+// //     scoreElement.style.fontWeight = "bold";
+// //     scoreElement.style.fontSize = "1.5em";
+// //     timeElement.style.fontWeight = "bold";
+// //     timeElement.style.fontSize = "1.5em";
+// // }
+
+
+// function showGameOver(isWin = false) {
+//     clearInterval(intervalId)
+//     clearInterval(timeIntervalId)
+    
+//     // Remove food class to prevent red color remaining
+//     blocks[`${food.x}-${food.y}`].classList.remove("food")
+    
+//     modal.style.display = "flex";
+//     startGameModal.style.display = "none";
+//     gameOverModal.style.display = "flex"
+    
+//     // Update game over text based on win/loss - Target the h3 inside game-over div
+//     const gameOverTitle = gameOverModal.querySelector("h3");
+//     const timeCountTitle = gameOverModal.querySelector(".time-count");
+//     const scoreCountTitle = gameOverModal.querySelector(".score-count");
+
+    
+//     // Debug line - check if element is found
+//     console.log("gameOverModal:", gameOverModal);
+//     console.log("gameOverTitle:", gameOverTitle);
+//     console.log("isWin:", isWin);
+    
+//     if (isWin) {
+//         gameOverTitle.textContent = "You Won! 🎉";        
+//         timeCountTitle.textContent = `The Time it took for you to win this game: ${time}`;
+//         scoreCountTitle.textContent = `Your Score: ${score}`;
+
+//     } else {
+//         gameOverTitle.textContent = "Game Over";
+//         gameOverTitle.style.color = "#fff"; // Default color for loss
+//     }
+    
+//     // Highlight score and time
+//     scoreElement.style.fontWeight = "bold";
+//     scoreElement.style.fontSize = "1.5em";
+//     timeElement.style.fontWeight = "bold";
+//     timeElement.style.fontSize = "1.5em";
+// }
+
+// function render() {
+//     let head = null
+
+//     blocks[`${food.x}-${food.y}` ].classList.add("food")
+//     if(direction === "left") {
+//         head = {x: snake[0].x, y: snake[0].y - 1  }
+//     } else if(direction === "right") {
+//         head = {x: snake[0].x, y: snake[0].y + 1  }  
+//     } else if(direction === "down") {
+//         head = {x: snake[0].x + 1, y: snake[0].y }  
+//     } else if(direction === "up") {
+//         head = {x: snake[0].x - 1, y: snake[0].y }  
+//     } 
+
+//     lastDirection = direction
+
+//     // Wall Collision Code
+//     if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
+//         showGameOver(false)
+//         return
+//     }
+
+//     // Check self collision
+//     for (let i = 0; i < snake.length; i++) {
+//         if (head.x === snake[i].x && head.y === snake[i].y) {
+//             showGameOver(false)
+//             return
+//         }
+//     }
+
+//     // food consume logic
+//     if (head.x == food.x && head.y == food.y) {
+//         blocks[`${food.x}-${food.y}` ].classList.remove("food")
+        
+//         snake.unshift(head)
+
+//         score += 10
+//         scoreElement.innerHTML = score
+
+//         if( score > highScore) {
+//             highScore = score
+//             localStorage.setItem("highscore", highScore.toString())
+//             highScoreElement.innerHTML = highScore
+//         }
+        
+//         // Check for win condition - all blocks filled
+//         const totalBlocks = rows * cols;
+//         if (snake.length === totalBlocks) {
+//             // snake.forEach(segment => { 
+//             //     blocks[ `${segment.x}-${segment.y}`].classList.add("fill")
+//             // });
+//             snake.forEach((segment, index) => {
+//     const block = blocks[`${segment.x}-${segment.y}`];
+
+//     block.classList.add("fill");
+//     block.classList.remove("snake-head", "snake-tail");
+
+//     if (index === 0) {
+//         block.classList.add("snake-head"); // head
+//     } 
+//     else if (index === snake.length - 1) {
+//         block.classList.add("snake-tail"); // tail
+//     }
+// });
+
+//             showGameOver(true) // Player wins!
+//             return
+//         }
+        
+//         food = generateFood()
+//         blocks[`${food.x}-${food.y}` ].classList.add("food")
+
+//     } else {
+//         snake.forEach(segment => { 
+//             blocks[ `${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
+//         });
+
+//         snake.unshift(head)
+//         snake.pop()
+//     }
+    
+//     // Clear old snake visuals
+// snake.forEach(segment => {
+//     const block = blocks[`${segment.x}-${segment.y}`];
+//     block.classList.remove("fill", "snake-head", "snake-tail");
+// });
+
+// // Move snake
+// snake.unshift(head);
+// snake.pop();
+
+// // Draw snake with head & tail styles
+// snake.forEach((segment, index) => {
+//     const block = blocks[`${segment.x}-${segment.y}`];
+//     block.classList.add("fill");
+
+//     if (index === 0) {
+//         block.classList.add("snake-head");
+//     } else if (index === snake.length - 1) {
+//         block.classList.add("snake-tail");
+//     }
+// });
+
+// }
+
+// startButton.addEventListener("click", function() {
+//     modal.style.display = "none"
+//     intervalId = setInterval(() => {
+//         render()
+//     }, 500);
+//     timeIntervalId = setInterval(()=> {
+//         let [min,sec] = time.split(":").map(Number)
+
+//         if( sec == 59) {
+//             min += 1
+//             sec = 0 
+//         } else {
+//             sec += 1
+//         }
+        
+//         time = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+//         timeElement.innerText = time
+//     },1000)
+// })
+
+// restartButton.addEventListener("click", restartGame);
+
+// function restartGame() {
+//     clearInterval(intervalId);
+//     clearInterval(timeIntervalId);
+   
+//     blocks[`${food.x}-${food.y}` ].classList.remove("food")
+//     snake.forEach(segment => { 
+//         blocks[ `${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
+//     });
+
+//     score = 0
+//     time = `00:00`
+
+//     scoreElement.innerText = score
+//     scoreElement.style.fontWeight = "normal"; // Reset styling
+//     scoreElement.style.fontSize = "1em";
+//     timeElement.innerText = time
+//     timeElement.style.fontWeight = "normal"; // Reset styling
+//     timeElement.style.fontSize = "1em";
+//     highScoreElement.innerText = highScore
+
+//     modal.style.display = "none"
+//     direction = "down"
+//     lastDirection = "down" 
+
+//     snake = [ { x: 1, y: 3} ]
+//     food = generateFood()
+    
+//     intervalId = setInterval(() => {
+//         render()
+//     }, 500); 
+
+//     timeIntervalId = setInterval(()=> {
+//         let [min,sec] = time.split(":").map(Number)
+
+//         if( sec == 59) {
+//             min += 1
+//             sec = 0 
+//         } else {
+//             sec += 1
+//         }
+        
+//         time = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
+//         timeElement.innerText = time
+//     },1000)
+// }
+
+// addEventListener("keydown", (event)=> {
+//     if (event.key === "ArrowUp" && lastDirection !== "down") {
+//         direction = "up"
+//     } else if (event.key === "ArrowRight" && lastDirection !== "left") {
+//         direction = "right"
+//     } else if (event.key === "ArrowDown" && lastDirection !== "up") {
+//         direction = "down"
+//     } else if (event.key === "ArrowLeft" && lastDirection !== "right") {
+//         direction = "left"
+//     } 
+// });
+
 const board = document.querySelector('.board');
 const startButton = document.querySelector('.btn-start');
 const modal = document.querySelector(".modal");
@@ -237,7 +551,6 @@ const restartButton = document.querySelector(".btn-restart");
 const highScoreElement = document.querySelector("#high-score");
 const scoreElement = document.querySelector("#score");
 const timeElement = document.querySelector("#time")
-
 
 const blockHeight = 50;
 const blockWidth = 50;
@@ -285,37 +598,6 @@ for (let row = 0; row < rows; row++) {
     }
 }
 
-// function showGameOver(isWin = false) {
-//     clearInterval(intervalId)
-//     clearInterval(timeIntervalId)
-    
-//     // Remove food class to prevent red color remaining
-//     blocks[`${food.x}-${food.y}`].classList.remove("food")
-    
-//     modal.style.display = "flex";
-//     startGameModal.style.display = "none";
-//     gameOverModal.style.display = "flex"
-    
-//     // Update game over text based on win/loss
-//     const gameOverTitle = gameOverModal.querySelector("h2");
-//     if (isWin) {
-//         gameOverTitle.textContent = "You Won! 🎉";
-//         gameOverTitle.style.color = "#4CAF50"; // Green color for win
-//     } else {
-//         gameOverTitle.textContent = "You Won! 🎉, Game has been finished";
-//         gameOverTitle.style.color = "#4CAF50"; // Green color for win
-//         // gameOverTitle.textContent = "Game Over";
-//         // gameOverTitle.style.color = "#fff"; // Default color for loss
-//     }
-    
-//     // Highlight score and time
-//     scoreElement.style.fontWeight = "bold";
-//     scoreElement.style.fontSize = "1.5em";
-//     timeElement.style.fontWeight = "bold";
-//     timeElement.style.fontSize = "1.5em";
-// }
-
-
 function showGameOver(isWin = false) {
     clearInterval(intervalId)
     clearInterval(timeIntervalId)
@@ -327,25 +609,23 @@ function showGameOver(isWin = false) {
     startGameModal.style.display = "none";
     gameOverModal.style.display = "flex"
     
-    // Update game over text based on win/loss - Target the h3 inside game-over div
-    const gameOverTitle = gameOverModal.querySelector("h3");
+    // Target the correct elements with their class names
+    const gameOverTitle = gameOverModal.querySelector(".result-heading");
     const timeCountTitle = gameOverModal.querySelector(".time-count");
     const scoreCountTitle = gameOverModal.querySelector(".score-count");
-
-    
-    // Debug line - check if element is found
-    console.log("gameOverModal:", gameOverModal);
-    console.log("gameOverTitle:", gameOverTitle);
-    console.log("isWin:", isWin);
     
     if (isWin) {
-        gameOverTitle.textContent = "You Won! 🎉";        
-        timeCountTitle.textContent = `The Time it took for you to win this game: ${time}`;
-        scoreCountTitle.textContent = `Your Score: ${score}`;
-
+        gameOverTitle.textContent = "You Won! 🎉";
+        gameOverTitle.style.color = "#4CAF50"; // Green color for win
+        timeCountTitle.textContent = `Time: ${time}`;
+        scoreCountTitle.textContent = `Score: ${score}`;
+        timeCountTitle.style.display = "block";
+        scoreCountTitle.style.display = "block";
     } else {
         gameOverTitle.textContent = "Game Over";
         gameOverTitle.style.color = "#fff"; // Default color for loss
+        timeCountTitle.style.display = "none";
+        scoreCountTitle.style.display = "none";
     }
     
     // Highlight score and time
@@ -403,23 +683,36 @@ function render() {
         // Check for win condition - all blocks filled
         const totalBlocks = rows * cols;
         if (snake.length === totalBlocks) {
-            // snake.forEach(segment => { 
-            //     blocks[ `${segment.x}-${segment.y}`].classList.add("fill")
-            // });
+            // Draw the final snake before showing win screen
             snake.forEach((segment, index) => {
-    const block = blocks[`${segment.x}-${segment.y}`];
+                const block = blocks[`${segment.x}-${segment.y}`];
+                block.classList.remove("fill", "snake-head", "snake-tail");
+                
+                if (snake.length === 1) {
+                    // Only head
+                    block.classList.add("snake-head");
+                } else if (snake.length === 2) {
+                    // Head and tail only
+                    if (index === 0) {
+                        block.classList.add("snake-head");
+                        block.setAttribute('data-direction', direction); 
+                    } else {
+                        block.classList.add("snake-tail");
+                    }
+                } else {
+                    // Head, body, and tail
+                    if (index === 0) {
+                        block.classList.add("snake-head");
+                        block.setAttribute('data-direction', direction);
 
-    block.classList.add("fill");
-    block.classList.remove("snake-head", "snake-tail");
-
-    if (index === 0) {
-        block.classList.add("snake-head"); // head
-    } 
-    else if (index === snake.length - 1) {
-        block.classList.add("snake-tail"); // tail
-    }
-});
-
+                    } else if (index === snake.length - 1) {
+                        block.classList.add("snake-tail");
+                    } else {
+                        block.classList.add("fill");
+                    }
+                }
+            });
+            
             showGameOver(true) // Player wins!
             return
         }
@@ -428,43 +721,47 @@ function render() {
         blocks[`${food.x}-${food.y}` ].classList.add("food")
 
     } else {
+        // Clear old snake visuals
         snake.forEach(segment => { 
-            blocks[ `${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
+            blocks[`${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
         });
 
         snake.unshift(head)
         snake.pop()
     }
     
-    // Clear old snake visuals
-snake.forEach(segment => {
-    const block = blocks[`${segment.x}-${segment.y}`];
-    block.classList.remove("fill", "snake-head", "snake-tail");
-});
-
-// Move snake
-snake.unshift(head);
-snake.pop();
-
-// Draw snake with head & tail styles
-snake.forEach((segment, index) => {
-    const block = blocks[`${segment.x}-${segment.y}`];
-    block.classList.add("fill");
-
-    if (index === 0) {
-        block.classList.add("snake-head");
-    } else if (index === snake.length - 1) {
-        block.classList.add("snake-tail");
-    }
-});
-
+    // Draw snake with proper head/body/tail styling
+    snake.forEach((segment, index) => {
+        const block = blocks[`${segment.x}-${segment.y}`];
+        
+        if (snake.length === 1) {
+            // Only head exists
+            block.classList.add("snake-head");
+        } else if (snake.length === 2) {
+            // Only head and tail, no body
+            if (index === 0) {
+                block.classList.add("snake-head");
+            } else {
+                block.classList.add("snake-tail");
+            }
+        } else {
+            // Head, body, and tail
+            if (index === 0) {
+                block.classList.add("snake-head");
+            } else if (index === snake.length - 1) {
+                block.classList.add("snake-tail");
+            } else {
+                block.classList.add("fill");
+            }
+        }
+    });
 }
 
 startButton.addEventListener("click", function() {
     modal.style.display = "none"
     intervalId = setInterval(() => {
         render()
-    }, 500);
+    }, 250);
     timeIntervalId = setInterval(()=> {
         let [min,sec] = time.split(":").map(Number)
 
@@ -488,17 +785,17 @@ function restartGame() {
    
     blocks[`${food.x}-${food.y}` ].classList.remove("food")
     snake.forEach(segment => { 
-        blocks[ `${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
+        blocks[`${segment.x}-${segment.y}`].classList.remove("fill", "snake-head", "snake-tail")
     });
 
     score = 0
     time = `00:00`
 
     scoreElement.innerText = score
-    scoreElement.style.fontWeight = "normal"; // Reset styling
+    scoreElement.style.fontWeight = "normal";
     scoreElement.style.fontSize = "1em";
     timeElement.innerText = time
-    timeElement.style.fontWeight = "normal"; // Reset styling
+    timeElement.style.fontWeight = "normal";
     timeElement.style.fontSize = "1em";
     highScoreElement.innerText = highScore
 
@@ -511,7 +808,7 @@ function restartGame() {
     
     intervalId = setInterval(() => {
         render()
-    }, 500); 
+    }, 250); 
 
     timeIntervalId = setInterval(()=> {
         let [min,sec] = time.split(":").map(Number)

@@ -14,7 +14,10 @@ html, body{
     /* Background Colors */
 
     --bg-primary-color: #0c0c0c;
-    --bg-fill-color: #fdfdfc;
+    /* --bg-fill-color: #f1f1e5; */
+    --bg-fill-color: #c4c4c4;
+    --bg-fill-head-color: #ffffff;
+    --bg-fill-tail-color: #555555;
     --bg-food-color: #ff3b3b;
 
 
@@ -152,7 +155,10 @@ section .infos {
     /* width: 30px; */
     border: 0.5px solid var(--border-primary-color);
     transition: all 0.1s ease;
+    position: relative;
 }
+
+
 
 /* .block {
     border: 0.5px solid rgba(42, 47, 74, 0.3);
@@ -175,7 +181,9 @@ section .infos {
 }
 
 .snake-head {
-    background: #ffffff;
+    /* background: #ffffff; */
+    background: var(--bg-fill-head-color);
+    border-radius: var(--border-radius-lg);
     box-shadow:
         0 0 12px rgba(255, 255, 255, 0.6),
         inset 0 0 6px rgba(255, 255, 255, 0.35);
@@ -183,12 +191,70 @@ section .infos {
 
 /* Snake tail – duller */
 .snake-tail {
-    background: #d0d0d0;
+    /* background: #d0d0d0; */
+    background: var(--bg-fill-tail-color);
+    border-radius: var(--border-radius-lg);
     box-shadow:
         0 0 3px rgba(255, 255, 255, 0.15),
         inset 0 0 2px rgba(255, 255, 255, 0.1);
     opacity: 0.85;
 }
+
+/* Eyes that change based on direction */
+.snake-head::before,
+.snake-head::after {
+    content: '';
+    position: absolute;
+    width: 15%;
+    height: 15%;
+    background-color: #212121;
+    border-radius: 50%;
+}
+
+/* Default (down) */
+.snake-head[data-direction="down"]::before {
+    left: 30%;
+    bottom: 30%;
+}
+
+.snake-head[data-direction="down"]::after {
+    right: 30%;
+    bottom: 30%;
+}
+
+/* Up */
+.snake-head[data-direction="up"]::before {
+    left: 30%;
+    top: 30%;
+}
+
+.snake-head[data-direction="up"]::after {
+    right: 30%;
+    top: 30%;
+}
+
+/* Left */
+.snake-head[data-direction="left"]::before {
+    left: 30%;
+    top: 30%;
+}
+
+.snake-head[data-direction="left"]::after {
+    left: 30%;
+    bottom: 30%;
+}
+
+/* Right */
+.snake-head[data-direction="right"]::before {
+    right: 30%;
+    top: 30%;
+}
+
+.snake-head[data-direction="right"]::after {
+    right: 30%;
+    bottom: 30%;
+}
+
 
 /* .food {
     background-color: var(--bg-food-color);
